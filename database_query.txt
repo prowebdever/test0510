@@ -1,0 +1,13 @@
+SELECT u.name, u.email, SUM(p.price * o.quantity) AS total_spent
+FROM users u
+JOIN (
+  SELECT user_id, product_id, SUM(quantity) AS total_quantity, SUM(price * quantity) AS total_price
+  FROM orders o
+  JOIN products p ON o.product_id = p.id
+  WHERE p.category = 'Electronics'
+  GROUP BY user_id, product_id
+  HAVING total_quantity >= 3 AND total_price > 1000
+) o ON u.id = o.user_id
+JOIN products p ON o.product_id = p.id
+GROUP BY u.id
+ORDER BY total_spent DESC;
